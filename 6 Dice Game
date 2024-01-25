@@ -1,0 +1,254 @@
+<html>
+    <head>
+        <title>6 Dice Game</title>
+    </head>
+    <style>
+        /* General Body Styling */
+body {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: aquamarine;
+    overscroll-behavior: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url(Black\ Smoke\ Night\ Sky.jpg) ;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+}
+
+/* Text Elements */
+h1 {
+    color: #000000;
+    text-align: center;
+    margin: 0;
+    margin-top: 20px;   
+}
+
+p {
+    margin: 10px;
+    font-weight: 700;
+    color: #000000;
+}
+
+/* Containers */
+.container {
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
+    justify-items: center;
+}
+
+.button-container {
+    display: flex; 
+    justify-content: center; 
+    gap: 10px; 
+    width: 100%;
+    max-width: 720px;
+}
+
+.container1{
+    padding: 10px;
+    margin: 0;
+    text-align: center;
+    
+    border-radius: 4px;
+    width: 90%;
+    max-width: 700px;
+}
+
+/* Buttons */
+button {
+    border: none;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: #f11919;
+    transition-duration: 0.4s;
+}
+
+button:hover {
+    background-color: #a90000;
+    transition-duration: 0.4s;
+}
+
+#rollButton {
+    background-color: #007BFF;
+}
+
+#rollButton:hover {
+    background-color: #0052a9;
+}
+
+#rollButton:disabled {
+    background-color: #3c5163;
+}
+
+#rollButton:disabled:hover {    
+    background-color: #647a8c;
+}
+
+/* Images */
+#playerDice img, #computerDice img {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    border: 5px solid transparent;
+}
+
+.red-border {
+    border-color: red !important;
+}
+    </style>
+    <body>
+        <!-- Main Container -->
+        <div class="container">
+            <!-- Game Title -->
+            <h1>6 Dice Game</h1>
+
+            <!-- Player Section -->
+            <div class="container1">
+                <h1 id="playerScore">Player: 0</h1>
+                <div id="playerDice">
+                    <img id="playerDice0" src="dice1.png" onclick="toggleHold(true, 0)">
+                    <img id="playerDice1" src="dice2.png" onclick="toggleHold(true, 1)">
+                    <img id="playerDice2" src="dice3.png" onclick="toggleHold(true, 2)">
+                    <img id="playerDice3" src="dice4.png" onclick="toggleHold(true, 3)">
+                    <img id="playerDice4" src="dice5.png" onclick="toggleHold(true, 4)">
+                </div>
+                <h2 id="status1">Total: 5</h2>
+            </div>
+
+            <!-- Computer Section -->
+            <div class="container1">
+                <h1 id="computerScore">Computer: 0</h1>
+                <div id="computerDice">
+                    <img id="computerDice0" src="dice1.png">
+                    <img id="computerDice1" src="dice2.png">
+                    <img id="computerDice2" src="dice3.png">
+                    <img id="computerDice3" src="dice4.png">
+                    <img id="computerDice4" src="dice5.png">
+                </div>
+                <h2 id="status2">Total: 5</h2>
+            </div>  
+
+            <!-- Game Controls -->
+            <div>
+                <button id="rollButton" onclick="rollDice()">Roll The Dice</button>
+                <button onclick="resetGame()">Reset The Game</button>
+            </div>
+        </div>
+
+    </body>
+    <script>
+        // Game State Variables
+var playerScore = 0;
+var computerScore = 0;
+var playerDice = [1, 1, 1, 1, 1];
+var computerDice = [1, 1, 1, 1, 1];
+var playerHold = [false, false, false, false, false];
+var computerHold = [false, false, false, false, false];
+var playerWins = 0;
+var computerWins = 0;
+
+// Dice Roll Function
+function rollDice() {
+    for (var i = 0; i < 5; i++) {
+        if (computerDice[i] >= 5) {
+            toggleHold(false, i);
+        }
+    }
+    for (var i = 0; i < 5; i++) {
+        if (!playerHold[i]) {
+            playerDice[i] = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('playerDice' + i).src = 'dice' + playerDice[i] + '.png';
+        }
+        if (!computerHold[i]) {
+            computerDice[i] = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('computerDice' + i).src = 'dice' + computerDice[i] + '.png';
+        }
+    }
+    updateTotal();
+}
+
+// Hold Toggle Function
+function toggleHold(player, i) {
+    if (player) {
+        playerHold[i] = !playerHold[i];
+        var element = document.getElementById('playerDice' + i);
+        if (element.classList.contains('red-border')) {
+            element.classList.remove('red-border');
+        } else {
+            element.classList.add('red-border');
+        }
+    } else {
+        computerHold[i] = !computerHold[i];
+        var element = document.getElementById('computerDice' + i);
+        if (element.classList.contains('red-border')) {
+            element.classList.remove('red-border');
+        } else {
+            element.classList.add('red-border');
+        }
+    }
+}
+
+// Score Update Function
+function updateTotal() {
+    playerScore = playerDice.reduce((a, b) => a + b, 0);
+    computerScore = computerDice.reduce((a, b) => a + b, 0);
+    document.getElementById('status1').innerHTML = 'Total: ' + playerScore;
+    document.getElementById('status2').innerHTML = 'Total: ' + computerScore;
+    checkWin();
+}
+
+// Win Check Function
+function checkWin() {
+    if (playerScore === 21 || computerScore === 21) {
+        document.getElementById('rollButton').disabled = true;
+        if (playerScore === 21) {
+            playerWins++;
+            document.getElementById('status1').innerHTML += ' Player Wins!';
+        } else {
+            computerWins++;
+            document.getElementById('status2').innerHTML += ' Computer Wins!';
+        }
+        document.getElementById('playerScore').innerHTML = 'Player: ' + playerWins;
+        document.getElementById('computerScore').innerHTML = 'Computer: ' + computerWins;
+    }
+}
+
+// Game Reset Function
+function resetGame() {
+    playerScore = 0;
+    computerScore = 0;
+    playerDice = [1, 1, 1, 1, 1];
+    computerDice = [1, 1, 1, 1, 1];
+    playerHold = [false, false, false, false, false];
+    computerHold = [false, false, false, false, false];
+    document.getElementById('rollButton').disabled = false;
+    for (var i = 0; i < 5; i++) {
+        var playerDiceElement = document.getElementById('playerDice' + i);
+        var computerDiceElement = document.getElementById('computerDice' + i);
+        playerDiceElement.src = 'dice1.png';
+        computerDiceElement.src = 'dice1.png';
+        if (playerDiceElement.classList.contains('red-border')) {
+            playerDiceElement.classList.remove('red-border');
+        }
+        if (computerDiceElement.classList.contains('red-border')) {
+            computerDiceElement.classList.remove('red-border');
+        }
+    }
+    updateTotal();
+}
+    </script>
+</html>
